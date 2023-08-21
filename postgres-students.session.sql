@@ -45,3 +45,52 @@ INSERT INTO users VALUES
                 ;
 
 INSERT INTO users VALUES ('TEST3','TEST3','test4@gmail.com','male',true,'2026-08-19',42,2.1);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CREATE TABLE products(
+    id serial PRIMARY KEY,
+    brand varchar(200) NOT NULL,
+    model varchar(300) NOT NULL,
+    description text,
+    price numeric(10, 2) NOT NULL CHECK (price > 0),
+    discounted_price numeric(10, 2) CHECK(discounted_price <= price)
+);
+
+INSERT INTO products(brand, model, price) VALUES 
+('Tovar 1', 'Model 1', 200),
+('Tovar 2', 'Model 2', 400),
+('Tovar 3', 'Model 3', 600),
+('Tovar 4', 'Model 4', 800);
+
+INSERT INTO products(brand, model, price) VALUES
+('Tovar 1', 'Model 1', 200);
+
+
+
+
+ALTER TABLE products 
+ADD CONSTRAINT "unique_brand_model_pair" UNIQUE(brand, model);
+
+
+ALTER TABLE products
+ADD COLUMN quantity int;
+
+ALTER TABLE products
+ADD CONSTRAINT "products_quantity_check" CHECK (quantity >= 0);
+
+ALTER TABLE products
+DROP CONSTRAINT "products_quantity_check";
