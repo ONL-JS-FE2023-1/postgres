@@ -5,7 +5,8 @@ CREATE TABLE books(
     year varchar(4),
     publisher varchar(100),
     synopsys text,
-    quantity int CHECK(quantity >= 0)
+    quantity int CHECK(quantity >= 0),
+    PRIMARY KEY(author, name)
 );
 
 INSERT INTO books(author, name, year, publisher, synopsys, quantity) VALUES
@@ -13,3 +14,7 @@ INSERT INTO books(author, name, year, publisher, synopsys, quantity) VALUES
 
 -- NULL 
 -- ''
+
+
+-- Author - 'John Doe', Book - 'Book 1', quantity - 8 // 1
+-- Author - 'John Doe', Book - 'Book 1', quantity - 5 // 2
