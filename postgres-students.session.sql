@@ -1,15 +1,17 @@
------ 1:1
+DELETE FROM contents WHERE id = 1;
 
-CREATE TABLE coaches(
-    id serial PRIMARY KEY,
-    name varchar(256) CHECK(name != '') NOT NULL
+-- ON DELETE CASCADE
+
+DROP TABLE reactions;
+
+team_id int REFERENCES teams(id)
+
+CREATE TABLE reactions(
+    content_id int REFERENCES contents(id) ON DELETE CASCADE,
+    user_id int REFERENCES users(id),
+    is_liked boolean
 );
 
-CREATE TABLE teams(
-    id serial PRIMARY KEY,
-    name varchar(256) CHECK(name != '') NOT NULL,
-    coach_id int REFERENCES coaches(id)
+INSERT INTO reactions VALUES (
+    1, 1, true
 );
-
-ALTER TABLE coaches
-ADD COLUMN team_id int REFERENCES teams(id);
