@@ -1,27 +1,44 @@
-DROP TABLE orders;
+-- Реалізувати чат між юзерами
+-- В кожного чата є певний власник
+-- В кожного юзера може бути багато чатів (юзер може состоять в багатьох чатах)
+-- В кожному чаті - багато повідомлень. Одне повідомлення - в одному чаті
 
-CREATE TABLE orders(
+CREATE TABLE chats(
     id serial PRIMARY KEY,
-    created_at timestamp NOT NULL DEFAULT current_timestamp,
-    customer_id int REFERENCES users(id) -- зовнішній ключ (foreign key)
+    name varchar(256) CHECK (name != '') NOT NULL,
+    owner_id int REFERENCES users(id),
+    created_at timestamp DEFAULT current_timestamp
 );
 
-ALTER TABLE users
-ADD COLUMN id serial PRIMARY KEY;
+INSERT INTO chats (name, owner_id) VALUES
+('superchat', 1);
 
-
--- таблиця1_to_таблиця2
-CREATE TABLE orders_to_products(
-    order_id int REFERENCES orders(id),
-    product_id int REFERENCES products(id),
-    quantity int,
-    PRIMARY KEY(order_id, product_id)
+CREATE TABLE chats_to_users(
+    chat_id int REFERENCES chats(id),
+    user_id int REFERENCES users(id),
+    join_at timestamp DEFAULT current_timestamp,
+    PRIMARY KEY(chat_id, user_id)
 );
 
--- Оформлення замовлення для Джона Доу
-INSERT INTO orders (customer_id) VALUES(1);
+INSERT INTO chats_to_users(chat_id, user_id) VALUES
+(2, 3);
 
-INSERT INTO orders_to_products (order_id, product_id, quantity) VALUES
-(1, 4, 2),
-(1, 2, 1),
-(1, 1, 1);
+INSERT INTO chats_to_users(chat_id, user_id) VALUES
+(2, 1);
+
+
+CREATE TABLE messages(
+    id serial PRIMARY KEY,
+    body text CHECK (body != '') NOT NULL,
+    created_at timestamp DEFAULT current_timestamp,
+    is_read boolean DEFAULT false NOT NULL,
+    author_id int,
+    chat_id int,
+    FOREIGN KEY (chat_id, author_id) REFERENCES chats_to_users(chat_id, user_id) 
+);
+
+INSERT INTO messages(body, author_id, chat_id) VALUES
+('Hi', 3, 2),
+('Hi Clark', 1, 2),
+('Go for coffee?', 1, 2),
+('Go', 3, 2);
