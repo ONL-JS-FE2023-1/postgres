@@ -1,43 +1,18 @@
-DELETE FROM contents
-WHERE id = 1;
-DELETE FROM contents;
--- ON DELETE CASCADE
-DROP TABLE reactions;
-team_id int REFERENCES teams(id) CREATE TABLE reactions(
-    content_id int REFERENCES contents(id) ON DELETE CASCADE,
-    user_id int REFERENCES users(id),
-    is_liked boolean
+CREATE TABLE citizens(
+    id serial PRIMARY KEY,
+    name varchar(256),
+    age int,
+    is_adult boolean GENERATED ALWAYS AS (age >= 18) STORED
+                                            -- >= ---> true
+                                            -- < ----> false
 );
-INSERT INTO reactions
-VALUES (1, 1, true);
--- CREATE TABLE orders(
--- ...
--- user_id int REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE
--- ...
---)
-UPDATE users
-SET gender = 'female'
-WHERE id = 2;
 
+INSERT INTO citizens(name, age) VALUES (
+    'Ivanov Ivan', 56
+);
 
+INSERT INTO citizens(name, age) VALUES (
+    'Petrov Petr', 17
+);
 
-INSERT INTO users (
-        first_name,
-        last_name,
-        email,
-        gender,
-        is_subscribe,
-        birthday,
-        foot_size,
-        height
-    )
-VALUES (
-        'John',
-        'Pavlov',
-        'john.pavlov@gmail.com',
-        'male',
-        true,
-        '1990-08-23',
-        45,
-        190.5
-    ) RETURNING *;
+UPDATE citizens SET age = 18 WHERE id = 2 RETURNING *;
