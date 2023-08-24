@@ -1,8 +1,16 @@
 module.exports.mapUsers = (usersArray) => {
-    return usersArray.map((user) => `('${user.firstName}', '${user.lastName}', '${user.email}', '${user.gender}', ${user.isSubscribe})`)
-    .join(',');
-}
-
+  return usersArray
+    .map(
+      ({ 
+        name: { first, last },
+        email,
+        gender,
+        dob: {date}
+    }) =>
+        `('${first}', '${last}', '${email}-${date}', '${gender}', ${Boolean(Math.random() > 0.5)}, '${date}')`
+    )
+    .join(",");
+};
 
 /*
 
