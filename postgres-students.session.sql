@@ -58,4 +58,8 @@ CREATE TABLE orders_to_products(
 ------------------------
 
 
-DELETE FROM users WHERE id >= 18;
+DROP TABLE messages, chats_to_users, chats, reactions, citizens, contents;
+
+DELETE FROM orders_to_products;
+DELETE FROM products;
+DELETE FROM orders;
