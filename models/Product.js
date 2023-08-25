@@ -2,6 +2,12 @@ class Product {
     static _client;
     static _tableName;
 
+    static async findAll() {
+        return await this._client.query(`
+        SELECT * FROM ${this._tableName}
+        `)
+    }
+
     static async bulkCreate(productsArray) {
         // 1 дія: зробили VALUES для INSERT'a
         const valuesString = productsArray.map(
