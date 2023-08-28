@@ -1,22 +1,10 @@
+-- PAGINATION
 
+-- сторінки
+-- кількість результатів на одній сторінці (LIMIT)
 
+SELECT * FROM users
+LIMIT 10
+OFFSET 20; -- 10 * (3-1) = 10 * 2 = 20 // отримання 3-ї сторінки
 
--- Знайти всіх користувачів, від 20 до 40 років
-SELECT first_name, last_name, birthday, extract("years" from age(birthday)) FROM users
-WHERE extract("years" from age(birthday)) BETWEEN 20 AND 40;
-
--- Перейменувати extract на age
-SELECT first_name, last_name, birthday, extract("years" from age(birthday)) AS age FROM users
-WHERE extract("years" from age(birthday)) BETWEEN 20 AND 40;
-
--- Аліас - псевдонім -- AS
-
-SELECT first_name AS "Ім'я",
-last_name AS "Прзівище",
-id AS "Особистий номер"
-FROM users; 
-
-
--- Аліаси для таблиць
-
-SELECT * FROM orders AS "Чек";
+-- OFFSET = LIMIT * (сторінку_яку_ми_запитуємо - 1)
