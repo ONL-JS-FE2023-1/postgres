@@ -1,34 +1,28 @@
--- АГРЕГАТНІ ФУНКЦІЇ
+/*
 
--- COUNT - підрахувати кількість
--- SUM - просумувати всі значення стовпця
--- AVG - середнє значення якогось стовпця
--- MIN - міімальне значення якогось стовпця
--- MAX - максимальне значення якогось стовпця
+1. Знайдіть середню вагу всіх чоловіків, яким 27 років
+2. Знайдіть середній вік всіх користувачів
+3. Знайдіть мінімальний та максимальний вік користувачів
+3.1 Знайти мінімальний і максимальний вік окремо, жінок і чоловіків
 
+*/
 
-SELECT max(salary) FROM workers;
-SELECT min(salary) FROM workers;
-SELECT sum(salary) FROM workers;
-SELECT avg(salary) FROM workers;
-
-SELECT count(id) FROM users;
-
--- GROUP BY
-
--- Розрахувати середню вагу для чоловіків і жінок
-SELECT gender, avg(weight) FROM users
-GROUP BY gender;
-
--- Знайти кількість чоловіків і жінок
-SELECT gender, count(id) FROM users
-GROUP BY gender;
-
--- Порахувати середню вагу всіх користувачів, які народились після 1985 року
+-- 1
 SELECT avg(weight) FROM users
-WHERE extract('years' from birthday) > 1985;
+WHERE extract('years' from age(birthday)) = 27 AND gender = 'male';
 
+-- 2
+SELECT avg(extract('years' from age(birthday))) FROM users;
 
--- Як varchar реагує на агрегатні функції?
-SELECT sum(first_name) FROM users; -- поверне помилку
-SELECT min(first_name) FROM users; -- поверне результат
+-- 3
+SELECT min(extract('years' from age(birthday))) AS "min age", max(extract('years' from age(birthday))) AS "max age"
+FROM users;
+
+-- 3.1
+INSERT INTO users(first_name, last_name, email, gender, birthday, is_subscribe) VALUES
+('TEST', 'TESTOVICH', 'TEST.TESTOVICH@GMAIL.COM', 'female', '1900-08-03', true)
+RETURNING *;
+
+SELECT gender, min(extract('years' from age(birthday))) AS "min age", max(extract('years' from age(birthday))) AS "max age"
+FROM users
+GROUP BY gender;
