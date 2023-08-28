@@ -1,10 +1,20 @@
--- PAGINATION
+SELECT id, concat(first_name, ' ', last_name) AS "full name", gender, email FROM users;
 
--- сторінки
--- кількість результатів на одній сторінці (LIMIT)
+-- Знайдіть всіх користувачів, повне ім'я (ім'я + прізвище) яких > 20 символів
 
-SELECT * FROM users
-LIMIT 10
-OFFSET 20; -- 10 * (3-1) = 10 * 2 = 20 // отримання 3-ї сторінки
+-- варіант 1
+SELECT 
+id, 
+concat(first_name, ' ', last_name) AS "full name", 
+gender, 
+email,
+char_length(concat(first_name, ' ', last_name)) AS "full name length" 
+FROM users
+WHERE char_length(concat(first_name, ' ', last_name)) > 20;
 
--- OFFSET = LIMIT * (сторінку_яку_ми_запитуємо - 1)
+
+-- варіант 2
+SELECT * FROM (
+  SELECT id, concat(first_name, ' ', last_name) AS "full name", gender FROM users
+) AS "FN"
+WHERE char_length("FN"."full name") > 20;
