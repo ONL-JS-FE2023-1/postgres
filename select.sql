@@ -1,56 +1,34 @@
+-- АГРЕГАТНІ ФУНКЦІЇ
 
--- Створити таблицю workers
--- id
--- name
--- salary
--- birthday
-
-CREATE TABLE workers(
-  id serial PRIMARY KEY,
-  name text CONSTRAINT name_check CHECK(name != '') NOT NULL,
-  salary int CHECK(salary > 0) NOT NULL,
-  birthday date CHECK (birthday < current_date)
-);
-
--- 1. Додайте робітника з ім'ям Олег, з/п 300
-
-INSERT INTO workers(name, salary, birthday) VALUES
-('Oleg', 300, '1994-03-26');
+-- COUNT - підрахувати кількість
+-- SUM - просумувати всі значення стовпця
+-- AVG - середнє значення якогось стовпця
+-- MIN - міімальне значення якогось стовпця
+-- MAX - максимальне значення якогось стовпця
 
 
--- 2. Додайте робітницю Ярославу, з/п 350
+SELECT max(salary) FROM workers;
+SELECT min(salary) FROM workers;
+SELECT sum(salary) FROM workers;
+SELECT avg(salary) FROM workers;
 
-INSERT INTO workers(name, salary, birthday) VALUES
-('Yaroslava', 350, '1991-01-21');
+SELECT count(id) FROM users;
 
--- 3. Додайте двох нових працівників одним запитом
--- Сашу, з/п 1000
--- Машу, з/п 200
+-- GROUP BY
 
-INSERT INTO workers(name, salary, birthday) VALUES
-('Sasha', 1000, '1985-01-14'),
-('Masha', 200, '1995-01-21')
-RETURNING *;
+-- Розрахувати середню вагу для чоловіків і жінок
+SELECT gender, avg(weight) FROM users
+GROUP BY gender;
 
--- 4. Встановити Олегу з/п 500
-UPDATE workers
-SET salary = 500
-WHERE name = 'Oleg'
-RETURNING *;
+-- Знайти кількість чоловіків і жінок
+SELECT gender, count(id) FROM users
+GROUP BY gender;
 
--- 5. Всім робітникам, з/п яких перевищує 500 долларів, врізати до 300 доларів
-UPDATE workers
-SET salary = 300
-WHERE salary > 500
-RETURNING *;
+-- Порахувати середню вагу всіх користувачів, які народились після 1985 року
+SELECT avg(weight) FROM users
+WHERE extract('years' from birthday) > 1985;
 
--- 6. Вибрати всіх робітників у віці від 20 до 35 років
--- варіант 1
-SELECT name, extract('years' from age(birthday)) AS age FROM workers
-WHERE extract('years' from age(birthday)) BETWEEN 20 AND 35;
 
---  варіант 2
-SELECT * FROM (
-  SELECT name, extract('years' from age(birthday)) AS age FROM workers
-) AS "workers_with_ages"
-WHERE "workers_with_ages".age BETWEEN 20 AND 35;
+-- Як varchar реагує на агрегатні функції?
+SELECT sum(first_name) FROM users; -- поверне помилку
+SELECT min(first_name) FROM users; -- поверне результат
