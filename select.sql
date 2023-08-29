@@ -1,27 +1,29 @@
--- ORDER BY - сортує дані в таблиці за якимсь стовпцем
--- ORDER BY може приймати стовпець таблиці, за яким потрібно проводити сортування
--- Крім того, може приймати 2 налаштування:
--- ASC - за збільшенням (за замовчуванням)
--- DESC - за зменшенням
+-- 1. Відсортувати юзерів за віком (кількістю повних років)
+-- 2. Відсортуйте телефони за ціною, від найдорожчого до найдешевшого
+-- 3. Виведіть топ-5 телефонів, які частіше за все купують (більше за все продано)
 
-SELECT concat(first_name, ' ', last_name) AS "full name" FROM users
-ORDER BY "full name" DESC;
+--1
+--VERSION 1
+SELECT first_name, last_name, birthday, extract("years" from age(birthday)) AS age
+FROM users
+ORDER BY age ASC;
 
---
+--VERSION 2
+SELECT * FROM (
+    SELECT first_name, last_name, birthday, extract("years" from age(birthday)) AS age
+    FROM users
+) AS "users_with_age"
+ORDER BY "users_with_age".age ASC;
 
-SELECT * FROM users
-WHERE birthday IS NOT NULL
-ORDER BY birthday DESC,
-            first_name DESC;
 
--- Задача: дізнатись, яких товарів у нас залишилось менше всіх
-
+--2
 SELECT *
 FROM products
-ORDER BY quantity ASC;
+ORDER BY price DESC;
 
--- Задача: вивести топ-5 телефонів, яких в нас залишилось найменше
-SELECT *
-FROM products
-ORDER BY quantity ASC
+--3
+SELECT product_id, sum(quantity) AS "кількість_продажів"
+FROM orders_to_products
+GROUP BY product_id
+ORDER BY "кількість_продажів" DESC
 LIMIT 5;
