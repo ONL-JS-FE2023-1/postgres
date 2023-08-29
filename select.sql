@@ -1,29 +1,27 @@
--- 1. Відсортувати юзерів за віком (кількістю повних років)
--- 2. Відсортуйте телефони за ціною, від найдорожчого до найдешевшого
--- 3. Виведіть топ-5 телефонів, які частіше за все купують (більше за все продано)
+-- Знайти кількість однорічок (кількість юзерів з однаковою кількістю років)
 
---1
---VERSION 1
 SELECT first_name, last_name, birthday, extract("years" from age(birthday)) AS age
 FROM users
-ORDER BY age ASC;
+ORDER BY age;
 
---VERSION 2
-SELECT * FROM (
-    SELECT first_name, last_name, birthday, extract("years" from age(birthday)) AS age
-    FROM users
-) AS "users_with_age"
-ORDER BY "users_with_age".age ASC;
+-- залишити тільки ті групи, в яких міститься більше 6-ти однорічок
 
+SELECT extract("years" from age(birthday)) AS "вікова_група", count(*) AS "кількість_користувачів_у_групі"
+FROM users
+GROUP BY "вікова_група"
+HAVING count(*) >= 6
+ORDER BY "вікова_група";
 
---2
-SELECT *
+-- Витягти всі бренди, у яких кількість телефонів > 2300
+
+SELECT brand, sum(quantity)
 FROM products
-ORDER BY price DESC;
+GROUP BY brand
+HAVING sum(quantity) > 2300;
 
---3
-SELECT product_id, sum(quantity) AS "кількість_продажів"
+-- Витягти всі телефони, яких було продано більше 50
+
+SELECT product_id, sum(quantity)
 FROM orders_to_products
 GROUP BY product_id
-ORDER BY "кількість_продажів" DESC
-LIMIT 5;
+HAVING sum(quantity) > 50;
