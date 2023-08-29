@@ -1,27 +1,117 @@
--- Знайти кількість однорічок (кількість юзерів з однаковою кількістю років)
+CREATE TABLE A(
+    v char(3),
+    t int
+);
 
-SELECT first_name, last_name, birthday, extract("years" from age(birthday)) AS age
-FROM users
-ORDER BY age;
+CREATE TABLE B(
+    v char(3)
+);
 
--- залишити тільки ті групи, в яких міститься більше 6-ти однорічок
+INSERT INTO A VALUES
+('XXX', 1),
+('XXY', 1),
+('XXZ', 1),
+('XYX', 2),
+('XYY', 2),
+('XYZ', 2),
+('YXX', 3),
+('YXY', 3),
+('YXZ', 3);
 
-SELECT extract("years" from age(birthday)) AS "вікова_група", count(*) AS "кількість_користувачів_у_групі"
-FROM users
-GROUP BY "вікова_група"
-HAVING count(*) >= 6
-ORDER BY "вікова_група";
+INSERT INTO B VALUES
+('ZXX'), ('XXX'), ('ZXZ'), ('YXZ'), ('YXY'); 
 
--- Витягти всі бренди, у яких кількість телефонів > 2300
+--
 
-SELECT brand, sum(quantity)
-FROM products
-GROUP BY brand
-HAVING sum(quantity) > 2300;
+SELECT * FROM A, B;
 
--- Витягти всі телефони, яких було продано більше 50
+-- UNION - об'єднання
+-- (все те, що в множині А + все те, що в множині B, значення, які повторюються - в 1 єкземплярі)
 
-SELECT product_id, sum(quantity)
-FROM orders_to_products
-GROUP BY product_id
-HAVING sum(quantity) > 50;
+-- INTERSECT (перетин)
+-- (все те, що є і в A і в B в одному єкземплярі)
+
+-- Різниця (EXCEPT):
+--      A мінус B: все з А мінус спільні елементи для А і B
+--      B мінус A: все з B мінус спільні елементи для A і B
+
+
+SELECT v FROM a
+UNION
+SELECT * FROM b;
+
+SELECT v FROM a
+INTERSECT
+SELECT * FROM b;
+
+
+SELECT v FROM a
+EXCEPT
+SELECT * FROM b;
+
+-- 5 - 3 = 2
+-- 3 - 5 = -2
+
+SELECT * FROM b
+EXCEPT
+SELECT v FROM a;
+
+
+-------------
+INSERT INTO users (
+    first_name,
+    last_name,
+    email,
+    gender,
+    is_subscribe,
+    birthday,
+    foot_size,
+    height,
+    weight
+  )
+VALUES (
+    'Test 20',
+    'Test 20',
+    'test20@gmail.com',
+    'male',
+    true,
+    '1985-08-08',
+    45,
+    186,
+    80
+  ),
+  (
+    'Test 21',
+    'Test 21',
+    'test21@gmail.com',
+    'male',
+    true,
+    '1985-08-08',
+    45,
+    186,
+    80
+  ),
+  (
+    'Test 22',
+    'Test 22',
+    'test22@gmail.com',
+    'male',
+    true,
+    '1985-08-08',
+    45,
+    186,
+    80
+  );
+
+-- Задача: дізнатись id всіх юзерів, які робили замовлення
+SELECT id FROM users
+INTERSECT
+SELECT customer_id FROM orders;
+
+-- Задача: Отримати id юзерів, які ніколи не робили замовлень
+SELECT id FROM users
+EXCEPT
+SELECT customer_id FROM orders;
+
+SELECT * FROM users
+WHERE id >= 990;
