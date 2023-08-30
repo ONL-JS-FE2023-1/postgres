@@ -21,10 +21,6 @@ INSERT INTO A VALUES
 INSERT INTO B VALUES
 ('ZXX'), ('XXX'), ('ZXZ'), ('YXZ'), ('YXY'); 
 
---
-
-SELECT * FROM A, B;
-
 -- UNION - об'єднання
 -- (все те, що в множині А + все те, що в множині B, значення, які повторюються - в 1 єкземплярі)
 
@@ -36,82 +32,46 @@ SELECT * FROM A, B;
 --      B мінус A: все з B мінус спільні елементи для A і B
 
 
-SELECT v FROM a
-UNION
-SELECT * FROM b;
-
-SELECT v FROM a
-INTERSECT
-SELECT * FROM b;
 
 
-SELECT v FROM a
-EXCEPT
-SELECT * FROM b;
-
--- 5 - 3 = 2
--- 3 - 5 = -2
-
-SELECT * FROM b
-EXCEPT
-SELECT v FROM a;
+------
+SELECT * FROM a, b
+WHERE A.v = B.v;
 
 
--------------
-INSERT INTO users (
-    first_name,
-    last_name,
-    email,
-    gender,
-    is_subscribe,
-    birthday,
-    foot_size,
-    height,
-    weight
-  )
-VALUES (
-    'Test 20',
-    'Test 20',
-    'test20@gmail.com',
-    'male',
-    true,
-    '1985-08-08',
-    45,
-    186,
-    80
-  ),
-  (
-    'Test 21',
-    'Test 21',
-    'test21@gmail.com',
-    'male',
-    true,
-    '1985-08-08',
-    45,
-    186,
-    80
-  ),
-  (
-    'Test 22',
-    'Test 22',
-    'test22@gmail.com',
-    'male',
-    true,
-    '1985-08-08',
-    45,
-    186,
-    80
-  );
+-----
+SELECT * FROM
+A JOIN B
+ON A.v = B.v;
 
--- Задача: дізнатись id всіх юзерів, які робили замовлення
-SELECT id FROM users
-INTERSECT
-SELECT customer_id FROM orders;
 
--- Задача: Отримати id юзерів, які ніколи не робили замовлень
-SELECT id FROM users
-EXCEPT
-SELECT customer_id FROM orders;
+-- Знайти всі замовлення юзера, у якого id = 5
+SELECT u.id AS "user_id", u.first_name, u.last_name, u.email, o.id AS "order_id", o.created_at FROM users AS u
+JOIN orders AS o
+ON o.customer_id = u.id
+WHERE u.id = 5;
 
-SELECT * FROM users
-WHERE id >= 990;
+--
+SELECT * FROM
+A JOIN B ON A.v = B.v JOIN products ON A.t = products.id;
+
+
+-- Знайти id всіх замовлень у чеку, де були замовлені телефони бренду Huawei
+SELECT * FROM
+products JOIN orders_to_products
+ON products.id = orders_to_products.product_id
+WHERE products.brand = 'Huawei';
+
+-- Порахувати скільки замовлень бренду Huawei всього було
+SELECT count(*) FROM
+products JOIN orders_to_products
+ON products.id = orders_to_products.product_id
+WHERE products.brand = 'Huawei';
+
+
+-- Зробити топ продажів, який бренд частіше за всіх купували
+SELECT p.brand, count(*) AS "quantity" FROM
+products AS p JOIN orders_to_products AS otp
+ON p.id = otp.product_id
+GROUP BY p.brand
+ORDER BY "quantity" DESC;
