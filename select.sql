@@ -1,41 +1,62 @@
-INSERT INTO products (
-    brand,
-    model,
-    description,
-    price,
-    discounted_price,
-    quantity
+
+  /*
+
+
+  1. Порахувати середній чек по всьому магазину.
+  2. Витягти всі замовлення вище середнього чека
+  3. Витягти всіх користувачів, в яких кількість замволень вище середнього
+  4. Витягти користувачів та кількість телефонів, які вони замовляли (кількість телефонів * quantity)
+
+
+  */
+
+  -- 1
+  SELECT avg(owc.cost) FROM (
+    -- запит знаходить суму кожного замовлення
+    SELECT otp.order_id, sum(p.price * otp.quantity) AS cost FROM
+    orders_to_products AS otp INNER JOIN products AS p
+    ON otp.product_id = p.id
+    GROUP BY otp.order_id
+  ) AS owc;
+
+
+  -- 2
+  
+  SELECT owc.* FROM (
+    -- запит знаходить суму кожного замовлення
+    SELECT otp.order_id, sum(p.price * otp.quantity) AS cost FROM
+    orders_to_products AS otp INNER JOIN products AS p
+    ON otp.product_id = p.id
+    GROUP BY otp.order_id
+  ) AS owc 
+  WHERE owc.cost > (
+    -- запит знаходить середній чек по всьому магазину
+    SELECT avg(owc.cost) FROM (
+    -- запит знаходить суму кожного замовлення
+    SELECT otp.order_id, sum(p.price * otp.quantity) AS cost FROM
+    orders_to_products AS otp INNER JOIN products AS p
+    ON otp.product_id = p.id
+    GROUP BY otp.order_id
+  ) AS owc
+  );
+
+
+  --- WITH
+
+  /*
+  WITH ...alias... AS table
+  SELECT ...
+  */
+
+  WITH orders_with_cost AS (
+    -- запит знаходить суму кожного замовлення
+    SELECT otp.order_id, sum(p.price * otp.quantity) AS cost FROM
+    orders_to_products AS otp INNER JOIN products AS p
+    ON otp.product_id = p.id
+    GROUP BY otp.order_id
   )
-VALUES (
-    'TEST!!!',
-    'TEST!!! 123',
-    'phones...',
-    200,
-    100,
-    15
-  ) RETURNING *;
-
-  -- Знайти телефони, які ніхто ніколи не купував
-  SELECT * FROM
-  products AS p LEFT JOIN orders_to_products AS otp
-  ON p.id = otp.product_id
-  WHERE otp.product_id IS NULL;
-
-  -- Знайти повну вартість кожного замовлення
-  SELECT otp.order_id, sum(p.price * otp.quantity) FROM
-  orders_to_products AS otp INNER JOIN products AS p
-  ON otp.product_id = p.id
-  GROUP BY otp.order_id;
-
-  -- Знайти кількість позицій в кожному замовленні
-  SELECT order_id, count(*)
-  FROM orders_to_products AS otp
-  GROUP BY order_id;
-
-  -- Знайти найпопулярніший товар
-  SELECT p.brand, p.model, p.id, sum(otp.quantity) FROM
-  products AS p INNER JOIN orders_to_products AS otp
-  ON p.id = otp.product_id
-  GROUP BY p.id
-  ORDER BY sum(otp.quantity) DESC
-  LIMIT 1;
+  SELECT orders_with_cost.* FROM orders_with_cost
+  WHERE orders_with_cost.cost > (
+    -- запит знаходить середній чек по всьому магазину
+    SELECT avg(orders_with_cost.cost) FROM orders_with_cost
+  );
