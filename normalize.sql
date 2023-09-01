@@ -1,30 +1,39 @@
+DROP TABLE employees, positions;
+
+
+
 CREATE TABLE employees(
     id serial PRIMARY KEY,
     name varchar(200),
-    position varchar(300) REFERENCES positions(name)
+    department varchar(200),
+    department_phone varchar(15)
 );
 
-INSERT INTO employees(name, position) VALUES
-('John', 'HR manager'),
-('Jane', 'Sales manager'),
-('Jake', 'Team Lead'),
-('Andrew', 'Driver'),
-('Loki', 'JS Fullstack Developer'),
-('Draw', 'Sales manager');
+INSERT INTO employees(name, department, department_phone) VALUES
+('John Doe', 'HR', '23-12-44'),
+('Jane Doe', 'Sales', '12-18-18'),
+('Clark Doe', 'TOP-managment', '99-99-99'),
+('Test Testovich', 'JS Fullstack Developers', '56-56-56');
 
-CREATE TABLE positions(
-    name varchar(300) PRIMARY KEY,
-    department varchar(300),
-    is_car_avability boolean
+CREATE TABLE departments(
+    name varchar(200) PRIMARY KEY,
+    phone_number varchar(15)
 );
 
-INSERT INTO positions(name, is_car_avability) VALUES
-('HR manager', false),
-('Sales manager', false),
-('Team Lead', true),
-('Driver', true),
-('JS Fullstack Developer', true);
 
-SELECT employees.id, employees.name, employees.position, positions.is_car_avability FROM
-employees JOIN positions
-ON employees.position = positions.name;
+INSERT INTO departments VALUES
+('HR', '23-12-44'),
+('Sales', '12-18-18'),
+('TOP-managment', '99-99-99'),
+('JS Fullstack Developers', '56-56-56');
+
+---
+
+ALTER TABLE employees
+DROP COLUMN department_phone;
+
+---
+
+ALTER TABLE employees
+ADD FOREIGN KEY(department)
+REFERENCES departments(name);
