@@ -1,39 +1,40 @@
-DROP TABLE employees, positions;
+/*
 
+teachers 1:m subjects
 
+subjects m:n teachers
 
-CREATE TABLE employees(
+students m:n subjects
+
+*/
+
+CREATE students(
     id serial PRIMARY KEY,
-    name varchar(200),
-    department varchar(200),
-    department_phone varchar(15)
+    name varchar(30)
 );
 
-INSERT INTO employees(name, department, department_phone) VALUES
-('John Doe', 'HR', '23-12-44'),
-('Jane Doe', 'Sales', '12-18-18'),
-('Clark Doe', 'TOP-managment', '99-99-99'),
-('Test Testovich', 'JS Fullstack Developers', '56-56-56');
-
-CREATE TABLE departments(
-    name varchar(200) PRIMARY KEY,
-    phone_number varchar(15)
+CREATE TABLE teachers(
+    id serial PRIMARY KEY,
+    name varchar(20),
+    subject varchar(300) REFERENCES subjects(name)
 );
 
+-- Пов'язуємо викладача, студента та предмет
 
-INSERT INTO departments VALUES
-('HR', '23-12-44'),
-('Sales', '12-18-18'),
-('TOP-managment', '99-99-99'),
-('JS Fullstack Developers', '56-56-56');
+CREATE TABLE students_to_teachers(
+    teacher_id int REFERENCES teachers(id),
+    student_id int REFERENCES students(id),
+    PRIMARY KEY(teacher_id, student_id)
+);
 
----
+-- Обмеження, яке ми встановили: 1 викладач може вести 1 предмет
 
-ALTER TABLE employees
-DROP COLUMN department_phone;
+INSERT INTO students_to_teachers VALUES
+(1, 1),
+(1, 2),
+(2, 1),
+(2, 2);
 
----
-
-ALTER TABLE employees
-ADD FOREIGN KEY(department)
-REFERENCES departments(name);
+CREATE TABLE subjects(
+    name varchar(300) PRIMARY KEY
+);
