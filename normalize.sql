@@ -1,40 +1,46 @@
+------Pizza Delivery-----
+
+
 /*
 
-teachers 1:m subjects
-
-subjects m:n teachers
-
-students m:n subjects
+Ресторани готують піцци
+Служби доставки розвозять піцци
+Ресторанів багато, ресторан зв'язаний зі службами доставки, які працюють в конкретних районах
+Служби доставки можуть працювати одночасно по декількох районах
 
 */
 
-CREATE students(
-    id serial PRIMARY KEY,
-    name varchar(30)
+CREATE TABLE reustrants(
+    id SERIAL PRIMARY KEY
+)
+
+CREATE TABLE delivery_services(
+    id serial PRIMARY KEY
+)
+
+CREATE TABLE restaurants_to_deliveries(
+    restaurant_id int REFERENCES reustrants(id),
+    delivery_id int REFERENCES delivery_services(id),
+    PRIMARY KEY(restaurant_id, delivery_id)
+)
+
+INSERT INTO restaurants_to_deliveries VALUES
+(1, 1, 'pepperoni'),
+(1, 1, 'sea'),
+(1, 1, '4chease'),
+(1, 1, 'hawaii'),
+(1, 2, 'pepperoni'),
+(1, 2, 'sea'),
+(1, 2, 'chief'),
+(1, 3, 'pepperoni');
+
+
+CREATE TABLE pizzas(
+    name varchar(200) PRIMARY KEY
 );
 
-CREATE TABLE teachers(
-    id serial PRIMARY KEY,
-    name varchar(20),
-    subject varchar(300) REFERENCES subjects(name)
-);
-
--- Пов'язуємо викладача, студента та предмет
-
-CREATE TABLE students_to_teachers(
-    teacher_id int REFERENCES teachers(id),
-    student_id int REFERENCES students(id),
-    PRIMARY KEY(teacher_id, student_id)
-);
-
--- Обмеження, яке ми встановили: 1 викладач може вести 1 предмет
-
-INSERT INTO students_to_teachers VALUES
-(1, 1),
-(1, 2),
-(2, 1),
-(2, 2);
-
-CREATE TABLE subjects(
-    name varchar(300) PRIMARY KEY
+CREATE TABLE pizzas_to_restaurants(
+    pizza_type varchar(300),
+    restaurant_id int REFERENCES reustrants(id),
+    PRIMARY KEY(pizza_type, restaurant_id) 
 );
