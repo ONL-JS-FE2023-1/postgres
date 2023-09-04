@@ -1,99 +1,53 @@
-/* Вивести юзерів, в яких в полі "стать" буде українською написано "жінка"
-або "чоловік" або "інше значення" */
+--- Порахувати кількість товару, ціна якого > 3000
 
+SELECT count(id) FROM products
+WHERE price > 3000;
 
-SELECT *, (
-    CASE gender
-        WHEN 'female' THEN 'жінка'
-        WHEN 'male' THEN 'чоловік'
-        ELSE 'інше значення'
-    END
-) AS "стать"
-FROM users;
+------
 
-
-/*
-Вивести на основі кількості років користувача, що він повнолітній або неповнолітній
-*/
-
-SELECT *, (
+SELECT sum(
     CASE
-        WHEN ( extract(year from age(birthday)) ) < 18 THEN 'неповнолітній'
-        WHEN ( extract(year from age(birthday)) ) >= 18 THEN 'повнолітній'
-        ELSE 'невідомо'
+        WHEN price > 3000 THEN 1
     END
-)
-FROM users;
+) FROM products;
 
 
-/*
+------COEALESCE
 
+SELECT COALESCE(NULL, 12, 24) --- 12
+SELECT COALESCE(NULL, NULL, NULL) -- NULL
 
-Вивести всі телефони (з таблиці products),
-якщо ціна телефону > 6 тис - "флагман",
-якщо ціна від 2 до 6 - "середній клас",
-якщо ціна <2 тис - "бюджетний"
+UPDATE products
+SET description = 'Супер теелфон з довгим описом'
+WHERE id BETWEEN 217 and 228;
 
-*/
+-- Якщо опис телефону є - виводимо цей опис
+-- Якщо опису немає, то виводимо - "про цей товар нічого не відомо"
 
-SELECT *, (
-    CASE
-        WHEN price > 6000 THEN 'Флагман'
-        WHEN price BETWEEN 2000 AND 6000 THEN 'Середній клас'
-        WHEN price < 2000 THEN 'Бюджетний'
-        ELSE 'Невідомо'
-    END
-) AS "статус_товара"
+SELECT id, brand, model, price, COALESCE(description, 'Про цей товар нічого невідомо')
 FROM products;
 
 
-/*
 
-Вивести користувачів з інформацією про їхні замовлення у вигляді:
-- якщо більше >=3 - "постійний клієнт"
-- якщо від 1 до 2 - "активний клієнт"
-- якщо 0 замовлень - "новий клієнт"
-*/
+------NULLIF
 
-SELECT u.id, u.email, (
-    CASE
-        WHEN count(o.id) >= 3 THEN 'Постійний клієнт'
-        WHEN count(o.id) BETWEEN 1 AND 2 THEN 'Активний клієнт'
-        WHEN count(o.id) = 0 THEN 'Новий клієнт'
-    END
-) FROM
-users AS u JOIN orders AS o
-ON u.id = o.customer_id
-GROUP BY u.id, u.email;
-
-----------
-
-INSERT INTO users (
-    first_name,
-    last_name,
-    email,
-    gender,
-    is_subscribe,
-    birthday
-  )
-VALUES (
-    'Iron',
-    'Man',
-    'tonymail@gmail.com',
-    'male',
-    true,
-    '1975-08-09'
-);
+SELECT NULLIF(NULL, NULL); --- NULL
+SELECT NULLIF(12, 12); --- NULL
+SELECT NULLIF(12, NULL); --- 12
+SELECT NULLIF(NULL, 12); --- NULL
 
 
-SELECT u.id, u.email, (
-    CASE
-        WHEN count(o.id) >= 3 THEN 'Постійний клієнт'
-        WHEN count(o.id) BETWEEN 1 AND 2 THEN 'Активний клієнт'
-        WHEN count(o.id) = 0 THEN 'Новий клієнт'
-    END
-) FROM
-users AS u LEFT JOIN orders AS o
-ON u.id = o.customer_id
-GROUP BY u.id, u.email
-ORDER BY count(o.id);
+-----GREATEST , LEAST
+
+-- GREATEST - найбільше зі списку аргументів
+-- LEAST - найменше зі списку аргументів
+
+SELECT GREATEST(5, 8, 2); -- 8
+SELECT LEAST(5, 8, 2); -- 2
+
+-- Задача: вивести всі товари
+-- якщо є знижка у товару (discounted_price) - виводимо саме знижку
+-- якщо знижки немає, виводимо звичайний price
+
+SELECT id, brand, model, LEAST(price, discounted_price)
+FROM products;
