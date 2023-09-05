@@ -56,9 +56,9 @@ CREATE TABLE manufacturers(
 CREATE TABLE orders(
     id serial PRIMARY KEY,
     product_id int REFERENCES products(id),
-    contract_address text CHECK (contract_address != '') NOT NULL,
     quantity_plan int NOT NULL,
     product_price decimal(10, 2),
+    contract_address text CHECK (contract_address != '') NOT NULL,
     contract_number int NOT NULL,
     contract_date date NOT NULL,
     manufacturer_id int REFERENCES manufacturers(id)

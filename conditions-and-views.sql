@@ -1,53 +1,62 @@
---- Порахувати кількість товару, ціна якого > 3000
+--Підзапити--
 
-SELECT count(id) FROM products
-WHERE price > 3000;
+-- IN, NOT IN, SOME, ANY, EXISTS, ALL
 
-------
+--Задача: знайти всіх користувачів, які робили замовлення
+-- Не використовувати JOIN, не використовувати будь-яких реляційних операцій
 
-SELECT sum(
-    CASE
-        WHEN price > 3000 THEN 1
-    END
-) FROM products;
+SELECT * FROM users AS u
+WHERE u.id IN (SELECT customer_id FROM orders);
 
+--Задача: знайти всіх користувачів, які не робили замовлень
 
-------COEALESCE
+SELECT * FROM users AS u
+WHERE u.id NOT IN (SELECT customer_id FROM orders);
 
-SELECT COALESCE(NULL, 12, 24) --- 12
-SELECT COALESCE(NULL, NULL, NULL) -- NULL
+--Задача: знайти телефони, які ніхто не замовляв
 
-UPDATE products
-SET description = 'Супер теелфон з довгим описом'
-WHERE id BETWEEN 217 and 228;
-
--- Якщо опис телефону є - виводимо цей опис
--- Якщо опису немає, то виводимо - "про цей товар нічого не відомо"
-
-SELECT id, brand, model, price, COALESCE(description, 'Про цей товар нічого невідомо')
-FROM products;
+SELECT * FROM products AS p
+WHERE p.id NOT IN (SELECT product_id FROM orders_to_products);
 
 
 
-------NULLIF
+-------EXISTS
 
-SELECT NULLIF(NULL, NULL); --- NULL
-SELECT NULLIF(12, 12); --- NULL
-SELECT NULLIF(12, NULL); --- 12
-SELECT NULLIF(NULL, 12); --- NULL
+--Задача: дізнатись,чи є в мене в таблиці юзер з id 4000
+
+SELECT EXISTS 
+(SELECT * FROM users
+WHERE id = 4000);
 
 
------GREATEST , LEAST
+---Задача: використовуючи EXISTS знайти всіх користувачів, які робили замовлення
 
--- GREATEST - найбільше зі списку аргументів
--- LEAST - найменше зі списку аргументів
+SELECT * FROM users AS u
+WHERE EXISTS (
+    SELECT * FROM orders AS o
+    WHERE u.id = o.customer_id
+);
 
-SELECT GREATEST(5, 8, 2); -- 8
-SELECT LEAST(5, 8, 2); -- 2
+---Задача: дізнатись, чи робив якийсь користувач замовлення. Відповідь подати у форматі true/false
+SELECT EXISTS 
+(SELECT * FROM orders
+WHERE customer_id = 994);
 
--- Задача: вивести всі товари
--- якщо є знижка у товару (discounted_price) - виводимо саме знижку
--- якщо знижки немає, виводимо звичайний price
 
-SELECT id, brand, model, LEAST(price, discounted_price)
-FROM products;
+--ANY/SOME
+--SOME--ANY--IN <<---- СИНОНІМИ
+
+--Задача: знайти всіх користувачів,які робили замовлення
+
+SELECT * FROM users AS u
+WHERE u.id = ANY (SELECT customer_id FROM orders);
+
+SELECT * FROM users AS u
+WHERE u.id = SOME (SELECT customer_id FROM orders);
+
+
+---ALL
+
+--Задача: Знайти всі телефони, які ніхто не купував
+SELECT * FROM products AS p
+WHERE p.id != ALL(SELECT product_id FROM orders_to_products);
