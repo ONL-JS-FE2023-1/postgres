@@ -1,41 +1,50 @@
---Задача: написати матеріалізовану вьюху, яка буде рахувати кількість замовлень
+/* ENUM */
 
-CREATE MATERIALIZED VIEW total_orders AS
-SELECT count(*) AS "загальна_кількість_замовлень"
-FROM orders; 
+---order status:
+-- true - виконано
+-- false - не виконано
 
-SELECT * FROM total_orders;
+SELECT * FROM orders
+WHERE status = true;
+
+
+--- 'processing' --- 'prosesing' --- '...' --- '...'
+
+---new
+---processing
+---shiped
+---done
+
+
+CREATE TYPE order_status AS ENUM('new', 'processing', 'shiped', 'done');
 
 ---
 
+ALTER TABLE orders
+ALTER COLUMN status
+TYPE order_status
+USING(
+    CASE status
+        WHEN false THEN 'processing'
+        WHEN true THEN 'done'
+        ELSE 'new'
+    END
+)::order_status;
+
+
+----
+DROP VIEW orders_with_price, users_with_orders_amount, users_with_total_amounts;
+
+----
+
 INSERT INTO orders (customer_id, status)
 VALUES (
-    105,
-    false
+    90,
+    'new'
 );
 
----Оновлення матеріалізованої вьюхи
 
-REFRESH MATERIALIZED VIEW total_orders;
-
-
---Функція, яка оновлює вьюху при виклику
-CREATE FUNCTION refresh_materialized_view()
-RETURNS void
-AS
-$$
-BEGIN
-    REFRESH MATERIALIZED VIEW total_orders;
-END;
-$$
-LANGUAGE plpgsql;
-
-SELECT refresh_materialized_view();
-
--- Видалення матеріалізованої вьюхи
-
-DROP MATERIALIZED VIEW total_orders;
-
---
-
-DROP FUNCTION refresh_materialized_view;
+------
+UPDATE orders
+SET status = 'shiped'
+WHERE id = 6;
