@@ -1,54 +1,54 @@
-/*
-ДЗ. Вирішити проблеми:
-1. Відсутність ключа у юзерів. Ключем має бути мейл
-2. Надлишкові дані про співробітників потребують нормалізації.
-Провести декомпозицію таблиці employees на дві таблиці:
-співробітники та відділи
-
-(-) 3. Зберігання паролю у сирому вигляді. Паролі мають зберігатись у захешованому вигляді
-password -> password_hash
-
-*/
-
-
-
--- 1
-
-ALTER TABLE newtask.users
-ADD PRIMARY KEY(email);
-
-
-ALTER TABLE newtask.employees
-ADD COLUMN id serial PRIMARY KEY;
-
--- 2
-
-CREATE TABLE newtask.positions(
-    id serial PRIMARY KEY,
-    department varchar(200) NOT NULL CHECK(department != ''),
-    position varchar(200) NOT NULL CHECK(position != '')
-);
-
-ALTER TABLE newtask.employees
-DROP COLUMN department;
-
-ALTER TABLE newtask.employees
-DROP COLUMN position;
-
-ALTER TABLE newtask.employees
-ADD COLUMN position_id int REFERENCES newtask.positions(id);
-
-
-
-
-
-/*
+/*Механізм транзакцій
 
 1. Атомарність - виконуються або всі запити, або не виконується жоден
-
-
----Зняття готівки у банку -> транзакції (на стороні банку)
-1. Сума коштів на вашому рахунку має зменшитись на ту сумму, яку ви знімаєте
-2. Фізична видача коштів у банкоматі
+2. Узгодженість - транзакція повинна переводити базу даних з одного узгодженого стану в інший
+3. Ізоляція - виконання однієї транзакції не повинно впливати на виконання інших транзакцій
+4. Стійкість - результати транзакції не мають бути втрачені при відмові системи
 
 */
+
+--СИНТАКСИС ТРАНЗАКЦІЙ
+
+/*
+
+BEGIN; --Початок транзакції
+
+--Ваші SQL запити (вставка, оновлення даних, видалення....)
+
+--Фіксуємо зміни, якщо все в порядку
+COMMIT;
+
+--Якщо сталася помилка або щось пішло не так
+ROLLBACK; -- Скасовує транзакцію та відміняє зміни
+
+--Кінець транзакції
+
+*/
+
+--Задача: Реалізувати транзакцію у нашому інтеренет-магазині
+--1. Створити нове замовлення (orders)
+--2. Наповнити замовлення (orders_to_products)
+
+
+BEGIN;
+
+INSERT INTO orders (customer_id, status)
+VALUES (2, 'new') RETURNING id;
+
+INSERT INTO orders_to_products (order_id, product_id, quantity)
+VALUES (LASTVAL(), 220, 1);
+
+INSERT INTO orders_to_products (order_id, product_id, quantity)
+VALUES (LASTVAL(), 221, 2);
+
+INSERT INTO orders_to_products (order_id, product_id, quantity)
+VALUES (LASTVAL(), 222, 3);
+
+COMMIT;
+
+ROLLBACK;
+
+-----
+
+SELECT * FROM orders_to_products
+WHERE order_id = 1625;
